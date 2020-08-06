@@ -68,9 +68,11 @@ class FareServiceTest {
     @DisplayName("추가요금을 구한다.")
     @Test
     void calculateFare() {
-        //거리에 따른 추가요금: 0원, 노선별 추가요금: 300원,
-        int additionalFare = fareService.calculateFare(subwayPath.calculateDistance(), MAX_FARE);
+        //거리에 따른 추가요금: 0원, 노선별 추가요금: 1000원, 연령(6세)별 할인 요금: -> 최종 요금: 1300원
+        int additionalFare = fareService.calculateFare(subwayPath.calculateDistance(), MAX_FARE, 6);
 
-        assertThat(additionalFare).isEqualTo(DEFAULT_FARE + MAX_FARE * 100);
+        assertThat(additionalFare).isEqualTo(1300);
     }
+
+
 }

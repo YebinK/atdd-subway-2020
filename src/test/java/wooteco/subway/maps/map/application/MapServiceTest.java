@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import wooteco.subway.members.member.domain.LoginMember;
 
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +43,8 @@ public class MapServiceTest {
     private List<Line> lines;
 
     private SubwayPath subwayPath;
+
+    private LoginMember loginMember;
 
     @BeforeEach
     void setUp() {
@@ -75,6 +78,8 @@ public class MapServiceTest {
         );
         subwayPath = new SubwayPath(lineStations);
 
+        loginMember = new LoginMember(10L, "elly@wooteco.com", "1234", 10);
+
         mapService = new MapService(lineService, stationService, pathService, fareService);
     }
 
@@ -84,7 +89,7 @@ public class MapServiceTest {
         when(pathService.findPath(anyList(), anyLong(), anyLong(), any())).thenReturn(subwayPath);
         when(stationService.findStationsByIds(anyList())).thenReturn(stations);
 
-        PathResponse pathResponse = mapService.findPath(1L, 3L, PathType.DISTANCE);
+        PathResponse pathResponse = mapService.findPath(1L, 3L, PathType.DISTANCE, loginMember.getAge());
 
         assertThat(pathResponse.getStations()).isNotEmpty();
         assertThat(pathResponse.getDuration()).isNotZero();

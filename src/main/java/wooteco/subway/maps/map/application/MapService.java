@@ -45,13 +45,13 @@ public class MapService {
         return new MapResponse(lineResponses);
     }
 
-    public PathResponse findPath(Long source, Long target, PathType type) {
+    public PathResponse findPath(Long source, Long target, PathType type, int memberAge) {
         List<Line> lines = lineService.findLines();
         SubwayPath subwayPath = pathService.findPath(lines, source, target, type);
         Map<Long, Station> stations = stationService.findStationsByIds(subwayPath.extractStationId());
 
         int lineExtraFare = findLargestFareLine(subwayPath);
-        int fare = fareService.calculateFare(subwayPath.calculateDistance(), lineExtraFare);
+        int fare = fareService.calculateFare(subwayPath.calculateDistance(), lineExtraFare, memberAge);
 
         return PathResponseAssembler.assemble(subwayPath, stations, fare);
     }

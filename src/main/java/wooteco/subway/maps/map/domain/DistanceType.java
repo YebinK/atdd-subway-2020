@@ -1,4 +1,4 @@
-package wooteco.subway.maps.map.application;
+package wooteco.subway.maps.map.domain;
 
 import java.util.Arrays;
 
@@ -34,8 +34,8 @@ public enum DistanceType {
 
     private static DistanceType whichDistanceType(int totalDistance) {
         return Arrays.stream(values())
-                .filter(val -> totalDistance > val.minDistance)
-                .filter(val -> totalDistance < val.maxDistance)
+                .filter(val -> totalDistance >= val.minDistance)
+                .filter(val -> totalDistance <= val.maxDistance)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("존재할 수 없는 거리입니다."));
     }

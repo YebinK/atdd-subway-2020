@@ -22,7 +22,7 @@ public class MapController {
     @GetMapping("/paths")
     public ResponseEntity<PathResponse> findPath(@AuthenticationPrincipal LoginMember loginMember, @RequestParam Long source, @RequestParam Long target,
                                                  @RequestParam PathType type) {
-        return ResponseEntity.ok(mapService.findPath(source, target, type));
+        return ResponseEntity.ok(mapService.findPath(source, target, type, loginMember.getAge()));
     }
 
     @GetMapping("/maps")
