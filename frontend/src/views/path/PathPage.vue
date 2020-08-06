@@ -220,6 +220,8 @@ export default {
     ...mapActions([SEARCH_PATH, FETCH_STATIONS]),
     async onSearchResult() {
       try {
+        await this.searchPath(this.path)
+          // .then(() => this.$store.getters("path/pathResult"))
       } catch (e) {
         this.showSnackbar(SNACKBAR_MESSAGES.COMMON.FAIL)
         console.error(e)
