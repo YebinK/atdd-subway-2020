@@ -14,9 +14,11 @@ import wooteco.subway.maps.map.dto.PathResponseAssembler;
 import wooteco.subway.maps.station.application.StationService;
 import wooteco.subway.maps.station.domain.Station;
 import wooteco.subway.maps.station.dto.StationResponse;
+import wooteco.subway.members.member.domain.LoginMember;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,10 +47,15 @@ public class MapService {
         return new MapResponse(lineResponses);
     }
 
-    public PathResponse findPath(Long source, Long target, PathType type, int memberAge) {
+    public PathResponse findPath(Long source, Long target, PathType type, LoginMember loginMember) {
         List<Line> lines = lineService.findLines();
         SubwayPath subwayPath = pathService.findPath(lines, source, target, type);
         Map<Long, Station> stations = stationService.findStationsByIds(subwayPath.extractStationId());
+
+        int memberAge = 0;
+        if (Objects.nonNull(loginMember)) {
+            memberAge = loginMember.getAge();
+        }
 
         int lineExtraFare = findLargestFareLine(subwayPath);
         int fare = fareService.calculateFare(subwayPath.calculateDistance(), lineExtraFare, memberAge);
