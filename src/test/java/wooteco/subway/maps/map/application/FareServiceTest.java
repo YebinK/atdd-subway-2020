@@ -19,6 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static wooteco.subway.common.TestObjectUtils.DEFAULT_FARE;
 
 class FareServiceTest {
+    public static final int MAX_FARE = 10;
+
     private FareService fareService;
 
     private Map<Long, Station> stations;
@@ -44,7 +46,7 @@ class FareServiceTest {
         line2.addLineStation(new LineStation(2L, null, 0, 0));
         line2.addLineStation(new LineStation(3L, 2L, 2, 1));
 
-        Line line3 = TestObjectUtils.createLine(3L, "3호선", "ORANGE", 0);
+        Line line3 = TestObjectUtils.createLine(3L, "3호선", "ORANGE", MAX_FARE);
         line3.addLineStation(new LineStation(1L, null, 0, 0));
         LineStation lineStation6 = new LineStation(4L, 1L, 1, 2);
         LineStation lineStation7 = new LineStation(3L, 4L, 2, 2);
@@ -63,13 +65,12 @@ class FareServiceTest {
     }
 
 
-    @DisplayName("거리별 추가요금을 구한다.")
+    @DisplayName("추가요금을 구한다.")
     @Test
     void calculateFare() {
-        //when
-        int additionalFare = fareService.calculateFare(subwayPath.calculateDistance());
+        //거리에 따른 추가요금: 0원, 노선별 추가요금: 300원,
+        int additionalFare = fareService.calculateFare(subwayPath.calculateDistance(), MAX_FARE);
 
-        //then
-        assertThat(additionalFare).isEqualTo(DEFAULT_FARE);
+        assertThat(additionalFare).isEqualTo(DEFAULT_FARE + MAX_FARE * 100);
     }
 }

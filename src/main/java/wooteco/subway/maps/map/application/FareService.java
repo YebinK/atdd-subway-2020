@@ -6,8 +6,8 @@ import wooteco.subway.maps.map.dto.PathResponse;
 @Service
 public class FareService {
 
-    public int calculateFare(int totalDistance) {
-        return fareByDistance(totalDistance);
+    public int calculateFare(int totalDistance, int lineExtraFare) {
+        return fareByDistance(totalDistance) + fareByLine(lineExtraFare);
     }
 
     //거리별 추가 요금
@@ -16,7 +16,7 @@ public class FareService {
     }
 
     //노선별 추가 요금
-    private int fareByLine(int fare) {
-        return 0;
+    private int fareByLine(int lineExtraFare) {
+        return lineExtraFare * 100;
     }
 }

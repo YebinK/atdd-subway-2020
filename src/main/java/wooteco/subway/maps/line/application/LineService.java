@@ -11,6 +11,7 @@ import wooteco.subway.maps.station.dto.StationResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -72,5 +73,14 @@ public class LineService {
         return line.getStationInOrder().stream()
                 .map(it -> LineStationResponse.of(line.getId(), it, StationResponse.of(stations.get(it.getStationId()))))
                 .collect(Collectors.toList());
+    }
+
+    public Integer findLargestFare(List<Long> lineIds) {
+        List<Line> lines = lineRepository.findAllById(lineIds);
+        List<Integer> lineFares = lines.stream()
+                .map(line -> line.getExtraFare())
+                .collect(Collectors.toList());
+
+        return Collections.max(lineFares);
     }
 }
