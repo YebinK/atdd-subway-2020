@@ -4,39 +4,27 @@ import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import wooteco.subway.common.TestObjectUtils;
-import wooteco.subway.maps.line.application.LineService;
 import wooteco.subway.maps.line.domain.Line;
 import wooteco.subway.maps.line.domain.LineStation;
 import wooteco.subway.maps.map.domain.LineStationEdge;
 import wooteco.subway.maps.map.domain.SubwayPath;
-import wooteco.subway.maps.map.dto.PathResponse;
-import wooteco.subway.maps.map.dto.PathResponseAssembler;
-import wooteco.subway.maps.station.application.StationService;
 import wooteco.subway.maps.station.domain.Station;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 class FareServiceTest {
     private FareService fareService;
-    @Mock
-    private MapService mapService;
-    @Mock
-    private LineService lineService;
-    @Mock
-    private StationService stationService;
-    @Mock
-    private PathService pathService;
 
     private Map<Long, Station> stations;
+
     private List<Line> lines;
 
     private SubwayPath subwayPath;
-
-    private PathResponse pathResponse;
 
     @BeforeEach
     void setUp() {
@@ -70,10 +58,6 @@ class FareServiceTest {
         );
         subwayPath = new SubwayPath(lineStations);
 
-        pathResponse = PathResponseAssembler.assemble(subwayPath, stations);
-
-        mapService = new MapService(lineService, stationService, pathService, fareService);
-
         fareService = new FareService();
     }
 
@@ -81,8 +65,10 @@ class FareServiceTest {
     @DisplayName("거리별 추가요금을 구한다.")
     @Test
     void calculateFare() {
-        int additionalFare = fareService.calculateFare(pathResponse);
-        System.err.println(additionalFare);
-//        assertThat(additionalFare).isEqualTo()
+        //when
+        int additionalFare = fareService.calculateFare(subwayPath.calculateDistance());
+
+        //then
+        assertThat(additionalFare).isEqualTo(1250);
     }
 }

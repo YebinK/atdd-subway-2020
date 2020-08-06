@@ -6,8 +6,7 @@ import wooteco.subway.maps.map.dto.PathResponse;
 @Service
 public class FareService {
 
-    public int calculateFare(PathResponse pathResponse) {
-        int totalDistance = pathResponse.getDistance();
+    public int calculateFare(int totalDistance) {
         return fareByDistance(totalDistance);
     }
 

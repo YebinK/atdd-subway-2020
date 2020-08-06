@@ -49,13 +49,11 @@ public class MapService {
         List<Line> lines = lineService.findLines();
         SubwayPath subwayPath = pathService.findPath(lines, source, target, type);
         Map<Long, Station> stations = stationService.findStationsByIds(subwayPath.extractStationId());
+        int fare = fareService.calculateFare(subwayPath.calculateDistance());
 
-        return PathResponseAssembler.assemble(subwayPath, stations);
+        return PathResponseAssembler.assemble(subwayPath, stations, fare);
     }
 
-    public int findFare(PathResponse pathResponse) {
-        return fareService.calculateFare(pathResponse);
-    }
 
     private Map<Long, Station> findStations(List<Line> lines) {
         List<Long> stationIds = lines.stream()
