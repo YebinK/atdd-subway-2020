@@ -18,4 +18,6 @@ public class TestObjectUtils {
         ReflectionTestUtils.setField(line1, "id", id);
         return line1;
     }
+
+    public static int DEFAULT_FARE = 1250;
 }

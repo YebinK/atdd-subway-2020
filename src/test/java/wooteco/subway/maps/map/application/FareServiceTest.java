@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static wooteco.subway.common.TestObjectUtils.DEFAULT_FARE;
 
 class FareServiceTest {
     private FareService fareService;
@@ -69,6 +70,6 @@ class FareServiceTest {
         int additionalFare = fareService.calculateFare(subwayPath.calculateDistance());
 
         //then
-        assertThat(additionalFare).isEqualTo(1250);
+        assertThat(additionalFare).isEqualTo(DEFAULT_FARE);
     }
 }
