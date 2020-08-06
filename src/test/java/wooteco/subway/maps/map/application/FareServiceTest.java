@@ -1,33 +1,28 @@
 package wooteco.subway.maps.map.application;
 
 import com.google.common.collect.Lists;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import wooteco.subway.common.TestObjectUtils;
 import wooteco.subway.maps.line.application.LineService;
 import wooteco.subway.maps.line.domain.Line;
 import wooteco.subway.maps.line.domain.LineStation;
 import wooteco.subway.maps.map.domain.LineStationEdge;
-import wooteco.subway.maps.map.domain.PathType;
 import wooteco.subway.maps.map.domain.SubwayPath;
-import wooteco.subway.maps.map.dto.MapResponse;
 import wooteco.subway.maps.map.dto.PathResponse;
+import wooteco.subway.maps.map.dto.PathResponseAssembler;
 import wooteco.subway.maps.station.application.StationService;
 import wooteco.subway.maps.station.domain.Station;
-import wooteco.subway.common.TestObjectUtils;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
-
-@ExtendWith(MockitoExtension.class)
-public class MapServiceTest {
+class FareServiceTest {
+    private FareService fareService;
+    @Mock
     private MapService mapService;
     @Mock
     private LineService lineService;
@@ -35,13 +30,13 @@ public class MapServiceTest {
     private StationService stationService;
     @Mock
     private PathService pathService;
-    @Mock
-    private FareService fareService;
 
     private Map<Long, Station> stations;
     private List<Line> lines;
 
     private SubwayPath subwayPath;
+
+    private PathResponse pathResponse;
 
     @BeforeEach
     void setUp() {
@@ -75,30 +70,19 @@ public class MapServiceTest {
         );
         subwayPath = new SubwayPath(lineStations);
 
+        pathResponse = PathResponseAssembler.assemble(subwayPath, stations);
+
         mapService = new MapService(lineService, stationService, pathService, fareService);
+
+        fareService = new FareService();
     }
 
+
+    @DisplayName("거리별 추가요금을 구한다.")
     @Test
-    void findPath() {
-        when(lineService.findLines()).thenReturn(lines);
-        when(pathService.findPath(anyList(), anyLong(), anyLong(), any())).thenReturn(subwayPath);
-        when(stationService.findStationsByIds(anyList())).thenReturn(stations);
-
-        PathResponse pathResponse = mapService.findPath(1L, 3L, PathType.DISTANCE);
-
-        assertThat(pathResponse.getStations()).isNotEmpty();
-        assertThat(pathResponse.getDuration()).isNotZero();
-        assertThat(pathResponse.getDistance()).isNotZero();
-    }
-
-    @Test
-    void findMap() {
-        when(lineService.findLines()).thenReturn(lines);
-        when(stationService.findStationsByIds(anyList())).thenReturn(stations);
-
-        MapResponse mapResponse = mapService.findMap();
-
-        assertThat(mapResponse.getLineResponses()).hasSize(3);
-
+    void calculateFare() {
+        int additionalFare = fareService.calculateFare(pathResponse);
+        System.err.println(additionalFare);
+//        assertThat(additionalFare).isEqualTo()
     }
 }

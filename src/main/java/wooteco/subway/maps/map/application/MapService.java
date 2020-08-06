@@ -25,11 +25,13 @@ public class MapService {
     private LineService lineService;
     private StationService stationService;
     private PathService pathService;
+    private FareService fareService;
 
-    public MapService(LineService lineService, StationService stationService, PathService pathService) {
+    public MapService(LineService lineService, StationService stationService, PathService pathService, FareService fareService) {
         this.lineService = lineService;
         this.stationService = stationService;
         this.pathService = pathService;
+        this.fareService = fareService;
     }
 
     public MapResponse findMap() {
@@ -49,6 +51,10 @@ public class MapService {
         Map<Long, Station> stations = stationService.findStationsByIds(subwayPath.extractStationId());
 
         return PathResponseAssembler.assemble(subwayPath, stations);
+    }
+
+    public int findFare(PathResponse pathResponse) {
+        return fareService.calculateFare(pathResponse);
     }
 
     private Map<Long, Station> findStations(List<Line> lines) {
