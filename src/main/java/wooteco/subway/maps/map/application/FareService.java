@@ -10,9 +10,13 @@ public class FareService {
         return fareByDistance(totalDistance);
     }
 
-    //거리별 추가요금
+    //거리별 추가 요금
     private int fareByDistance(int totalDistance) {
         return DistanceType.calculateAdditionalFare(totalDistance);
     }
 
+    //노선별 추가 요금
+    private int fareByLine(int fare) {
+        return 0;
+    }
 }
