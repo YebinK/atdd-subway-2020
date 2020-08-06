@@ -1,78 +1,92 @@
 package wooteco.subway.maps.map.application;
 
-import com.google.common.collect.Lists;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import wooteco.subway.common.TestObjectUtils;
-import wooteco.subway.maps.line.domain.Line;
-import wooteco.subway.maps.line.domain.LineStation;
-import wooteco.subway.maps.map.domain.LineStationEdge;
-import wooteco.subway.maps.map.domain.SubwayPath;
-import wooteco.subway.maps.station.domain.Station;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static wooteco.subway.common.TestObjectUtils.DEFAULT_FARE;
 
 class FareServiceTest {
-    public static final int MAX_FARE = 10;
+    private FareService fareService = new FareService();
 
-    private FareService fareService;
-
-    private Map<Long, Station> stations;
-
-    private List<Line> lines;
-
-    private SubwayPath subwayPath;
-
-    @BeforeEach
-    void setUp() {
-        stations = new HashMap<>();
-        stations.put(1L, TestObjectUtils.createStation(1L, "교대역"));
-        stations.put(2L, TestObjectUtils.createStation(2L, "강남역"));
-        stations.put(3L, TestObjectUtils.createStation(3L, "양재역"));
-        stations.put(4L, TestObjectUtils.createStation(4L, "남부터미널역"));
-
-        Line line1 = TestObjectUtils.createLine(1L, "2호선", "GREEN", 0);
-        line1.addLineStation(new LineStation(1L, null, 0, 0));
-        LineStation lineStation2 = new LineStation(2L, 1L, 2, 2);
-        line1.addLineStation(new LineStation(2L, 1L, 2, 2));
-
-        Line line2 = TestObjectUtils.createLine(2L, "신분당선", "RED", 0);
-        line2.addLineStation(new LineStation(2L, null, 0, 0));
-        line2.addLineStation(new LineStation(3L, 2L, 2, 1));
-
-        Line line3 = TestObjectUtils.createLine(3L, "3호선", "ORANGE", MAX_FARE);
-        line3.addLineStation(new LineStation(1L, null, 0, 0));
-        LineStation lineStation6 = new LineStation(4L, 1L, 1, 2);
-        LineStation lineStation7 = new LineStation(3L, 4L, 2, 2);
-        line3.addLineStation(lineStation6);
-        line3.addLineStation(lineStation7);
-
-        lines = Lists.newArrayList(line1, line2, line3);
-
-        List<LineStationEdge> lineStations = Lists.newArrayList(
-                new LineStationEdge(lineStation6, line3.getId()),
-                new LineStationEdge(lineStation7, line3.getId())
-        );
-        subwayPath = new SubwayPath(lineStations);
-
-        fareService = new FareService();
-    }
-
-
-    @DisplayName("추가요금을 구한다.")
+    @DisplayName("추가요금을 구한다. - 추가요금 없음")
     @Test
-    void calculateFare() {
-        //거리에 따른 추가요금: 0원, 노선별 추가요금: 1000원, 연령(6세)별 할인 요금: -> 최종 요금: 1300원
-        int additionalFare = fareService.calculateFare(subwayPath.calculateDistance(), MAX_FARE, 6);
+    void calculateFare1() {
+        //거리(7km)에 따른 추가요금: 0원, 노선별 추가요금: 0원, 연령(5세)별 할인 요금: 0원 -> 최종 요금: 1250원
+        int additionalFare = fareService.calculateFare(7, 0, 5);
 
-        assertThat(additionalFare).isEqualTo(1300);
+        assertThat(additionalFare).isEqualTo(1250);
+    }
+
+    @DisplayName("추가요금을 구한다. - 거리에 따른 추가요금(10-50km)")
+    @Test
+    void calculateFare2() {
+        //거리(15km)에 따른 추가요금: 900원, 노선별 추가요금: 0원, 연령(5세)별 할인 요금: 0원 -> 최종 요금: 1350원
+        int additionalFare = fareService.calculateFare(15, 0, 5);
+
+        assertThat(additionalFare).isEqualTo(1350);
+    }
+
+    @DisplayName("추가요금을 구한다. - 거리에 따른 추가요금(50km 이상)")
+    @Test
+    void calculateFare3() {
+        //거리(60km)에 따른 추가요금: 900원, 노선별 추가요금: 0원, 연령(5세)별 할인 요금: -> 최종 요금: 2150원
+        int additionalFare = fareService.calculateFare(60, 0, 5);
+
+        assertThat(additionalFare).isEqualTo(2150);
     }
 
 
+    @DisplayName("추가요금을 구한다. - 노선별 추가요금(100원)")
+    @Test
+    void calculateFare4() {
+        //거리(5km)에 따른 추가요금: 0원, 노선별 추가요금: 100원, 연령(5세)별 할인 요금: 0원 -> 최종 요금: 1350원
+        int additionalFare = fareService.calculateFare(5, 1, 5);
+
+        assertThat(additionalFare).isEqualTo(1350);
+    }
+
+    @DisplayName("추가요금을 구한다. - 노선별 추가요금(300원)")
+    @Test
+    void calculateFare5() {
+        //거리(5km)에 따른 추가요금: 0, 노선별 추가요금: 300원, 연령(5세)별 할인 요금: -> 최종 요금: 1550원
+        int additionalFare = fareService.calculateFare(5, 3, 5);
+
+        assertThat(additionalFare).isEqualTo(1550);
+    }
+
+    @DisplayName("추가요금을 구한다. - 6세 미만 어린이 할인 없음")
+    @Test
+    void calculateFare6() {
+        //거리(5km)에 따른 추가요금: 0원, 노선별 추가요금: 0원, 연령(5세)별 할인 요금: 0원 -> 최종 요금: 1250원
+        int additionalFare = fareService.calculateFare(5, 0, 5);
+
+        assertThat(additionalFare).isEqualTo(1250);
+    }
+
+    @DisplayName("추가요금을 구한다. - 6-13세 어린이 할인")
+    @Test
+    void calculateFare7() {
+        //거리(5km)에 따른 추가요금: 0, 노선별 추가요금: 0원, 연령(6세)별 할인 요금: -> 최종 요금: 800원
+        int additionalFare = fareService.calculateFare(5, 0, 6);
+
+        assertThat(additionalFare).isEqualTo(800);
+    }
+
+    @DisplayName("추가요금을 구한다. - 13-19세 청소년 할인")
+    @Test
+    void calculateFare8() {
+        //거리(5km)에 따른 추가요금: 0, 노선별 추가요금: 0원, 연령(17세)별 할인 요금: -> 최종 요금: 1550원
+        int additionalFare = fareService.calculateFare(5, 0, 17);
+
+        assertThat(additionalFare).isEqualTo(1070);
+    }
+
+    @DisplayName("추가요금을 구한다. - 19세 이상 성인 할인 없음")
+    @Test
+    void calculateFare9() {
+        //거리(5km)에 따른 추가요금: 0원, 노선별 추가요금: 0원, 연령(25세)별 할인 요금: 0원 -> 최종 요금: 1250원
+        int additionalFare = fareService.calculateFare(5, 0, 25);
+
+        assertThat(additionalFare).isEqualTo(1250);
+    }
 }
